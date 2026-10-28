@@ -7,9 +7,8 @@ import { createSupabaseLeadRepository } from '../../infrastructure/supabase/supa
 import { resolveTenantId } from '../../infrastructure/supabase/tenant'
 import { systemClock } from '../../infrastructure/clock'
 import { uuid } from '../../infrastructure/id'
-import { pipeline, stageOrder } from '../../config/pipeline.config'
-
-const stageLabel = (id: string) => pipeline.stages.find((s) => s.id === id)?.label ?? id
+import { stageOrder } from '../../config/pipeline.config'
+import { stageLabel } from '../stageMeta'
 
 /**
  * Live-mode providers. Manages the Supabase session, resolves the user's

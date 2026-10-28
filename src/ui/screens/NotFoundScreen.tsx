@@ -3,7 +3,7 @@ import { EmptyState } from '../components/primitives'
 
 export function NotFoundScreen() {
   return (
-    <div style={{ marginTop: '2rem' }}>
+    <div className="mt-8">
       <EmptyState
         title="Página no encontrada"
         description="La ruta que buscas no existe."

@@ -3,8 +3,9 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import { App } from './App'
 import { brand } from './config/brand.config'
-import { pipeline, stageOrder } from './config/pipeline.config'
+import { stageOrder } from './config/pipeline.config'
 import { applyBrandTheme, applyTheme, getStoredTheme } from './ui/theme/applyBrandTheme'
+import { stageLabel } from './ui/stageMeta'
 import { createLeadService } from './application/leadService'
 import { createLocalStorageLeadRepository, isLocalStorageAvailable } from './infrastructure/localStorageLeadRepository'
 import { demoSeed } from './infrastructure/seed'
@@ -15,7 +16,6 @@ import { DemoAuthProvider } from './ui/access/DemoAuthProvider'
 import { LiveAuthProvider } from './ui/access/LiveAuthProvider'
 import { ServiceProvider } from './ui/app/ServiceContext'
 
-const stageLabel = (id: string) => pipeline.stages.find((s) => s.id === id)?.label ?? id
 const mode = import.meta.env.VITE_MODE === 'live' ? 'live' : 'demo'
 
 // Apply branding + theme before first paint.
@@ -25,10 +25,10 @@ document.title = brand.name
 
 function ConfigError() {
   return (
-    <div style={{ maxWidth: '32rem', margin: '4rem auto', padding: '0 1rem' }}>
-      <div className="card" style={{ padding: '1.5rem' }}>
-        <h1 style={{ marginTop: 0, fontSize: '1.2rem' }}>Falta configurar Supabase</h1>
-        <p style={{ color: 'var(--text-muted)' }}>
+    <div className="mx-auto mt-16 max-w-lg px-4">
+      <div className="card p-6">
+        <h1 className="text-xl font-semibold">Falta configurar Supabase</h1>
+        <p className="mt-2 text-muted">
           El modo en vivo (VITE_MODE=live) requiere <code>VITE_SUPABASE_URL</code> y{' '}
           <code>VITE_SUPABASE_ANON_KEY</code>. Revisa tu archivo <code>.env</code> (ver <code>.env.example</code>).
         </p>

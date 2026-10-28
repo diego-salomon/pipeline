@@ -48,10 +48,10 @@ export function BoardScreen() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 style={{ margin: 0, fontSize: '1.5rem' }}>Tablero</h1>
-          <p style={{ margin: '0.25rem 0 0', color: 'var(--text-muted)' }}>
+          <h1 className="text-2xl font-semibold">Tablero</h1>
+          <p className="mt-1 text-muted">
             {leads.length} {leads.length === 1 ? pipeline.entity.singular : pipeline.entity.plural} ·{' '}
             {formatMoney(totalValue)} en total · {formatMoney(wonValue)} ganado
           </p>
@@ -66,16 +66,14 @@ export function BoardScreen() {
           const inStage = leads.filter((l) => l.stage === stage.id)
           return (
             <section key={stage.id} className="md:w-72 md:flex-none">
-              <header style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <header className="mb-2 flex items-center gap-2">
                 <span className="chip__dot" style={{ background: stageColor(stage.id) }} />
-                <h2 style={{ margin: 0, fontSize: '0.95rem' }}>{stage.label}</h2>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{inStage.length}</span>
+                <h2 className="text-sm font-semibold">{stage.label}</h2>
+                <span className="text-sm text-muted">{inStage.length}</span>
               </header>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-                {inStage.length === 0 && (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', padding: '0.5rem 0' }}>Sin registros</p>
-                )}
+              <div className="flex flex-col gap-2.5">
+                {inStage.length === 0 && <p className="py-2 text-sm text-muted">Sin registros</p>}
                 {inStage.map((lead) => (
                   <LeadCard key={lead.id} lead={lead} busy={busyId === lead.id} onAdvance={() => handleAdvance(lead)} />
                 ))}
@@ -93,32 +91,31 @@ function LeadCard({ lead, busy, onAdvance }: { lead: Lead; busy: boolean; onAdva
   const activity = lastActivityAt(lead.history)
   const closed = isClosed(stageOrder, lead.stage)
   const advanceable = canAdvance(stageOrder, lead.stage)
+  const open = () => navigate(`/leads/${lead.id}`)
 
   return (
     <article
-      className="card"
-      style={{ padding: '0.875rem', cursor: 'pointer' }}
-      onClick={() => navigate(`/leads/${lead.id}`)}
+      className="card cursor-pointer p-3.5 transition-colors hover:border-brand/40"
+      onClick={open}
       role="link"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter') navigate(`/leads/${lead.id}`)
+        if (e.key === 'Enter') open()
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem' }}>
-        <strong style={{ fontSize: '0.95rem' }}>{lead.organization}</strong>
-        <span style={{ fontWeight: 700, whiteSpace: 'nowrap' }}>{formatMoney(lead.estimatedValue)}</span>
+      <div className="flex justify-between gap-2">
+        <strong className="text-sm">{lead.organization}</strong>
+        <span className="whitespace-nowrap font-bold">{formatMoney(lead.estimatedValue)}</span>
       </div>
-      <p style={{ margin: '0.25rem 0 0', color: 'var(--text-muted)', fontSize: '0.85rem' }}>{lead.product}</p>
-      <p style={{ margin: '0.35rem 0 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+      <p className="mt-1 text-sm text-muted">{lead.product}</p>
+      <p className="mt-1.5 text-xs text-muted">
         {activity ? `Última actividad ${formatRelative(activity)}` : 'Sin actividad'}
       </p>
 
       {advanceable ? (
         <button
           type="button"
-          className="btn btn--ghost"
-          style={{ marginTop: '0.75rem', width: '100%' }}
+          className="btn btn--ghost mt-3 w-full"
           disabled={busy}
           onClick={(e) => {
             e.stopPropagation()
@@ -129,7 +126,7 @@ function LeadCard({ lead, busy, onAdvance }: { lead: Lead; busy: boolean; onAdva
           {!busy && <Icon path={ARROW} size={16} />}
         </button>
       ) : closed ? (
-        <p style={{ marginTop: '0.75rem', marginBottom: 0, color: 'var(--stage-4)', fontWeight: 600, fontSize: '0.85rem' }}>
+        <p className="mt-3 text-sm font-semibold" style={{ color: 'var(--stage-4)' }}>
           ✓ Cerrada
         </p>
       ) : null}

@@ -57,22 +57,22 @@ export function NewLeadScreen() {
   const f = pipeline.fieldLabels
 
   return (
-    <div style={{ maxWidth: '38rem', margin: '0 auto' }}>
-      <h1 style={{ marginTop: 0 }}>Nueva {pipeline.entity.singular}</h1>
-      <form className="card" style={{ padding: '1.25rem', display: 'grid', gap: '1rem' }} onSubmit={onSubmit} noValidate>
+    <div className="mx-auto max-w-[38rem]">
+      <h1 className="mb-4 text-2xl font-semibold">Nueva {pipeline.entity.singular}</h1>
+      <form className="card grid gap-4 p-5" onSubmit={onSubmit} noValidate>
         <TextField label={f.organization} value={form.organization} onChange={set('organization')} error={errors.organization} autoFocus />
         <TextField label={f.contactName} value={form.contactName} onChange={set('contactName')} error={errors.contactName} />
-        <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
+        <div className="grid grid-cols-2 gap-4">
           <TextField label={f.phone} value={form.phone} onChange={set('phone')} error={errors.phone} type="tel" />
           <TextField label={f.email} value={form.email} onChange={set('email')} error={errors.email} type="email" />
         </div>
         <TextField label={f.product} value={form.product} onChange={set('product')} error={errors.product} />
-        <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
+        <div className="grid grid-cols-2 gap-4">
           <TextField label={f.quantity} value={form.quantity} onChange={set('quantity')} error={errors.quantity} type="number" inputMode="numeric" min="1" />
           <TextField label={f.estimatedValue} value={form.estimatedValue} onChange={set('estimatedValue')} error={errors.estimatedValue} type="number" inputMode="decimal" min="0" />
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.25rem' }}>
+        <div className="mt-1 flex justify-end gap-3">
           <button type="button" className="btn btn--ghost" onClick={() => navigate('/')}>
             Cancelar
           </button>

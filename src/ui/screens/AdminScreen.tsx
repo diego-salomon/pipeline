@@ -32,9 +32,9 @@ function LoginForm() {
   }
 
   return (
-    <div style={{ maxWidth: '24rem', margin: '2rem auto 0' }}>
-      <h1 style={{ marginTop: 0, textAlign: 'center' }}>{brand.name}</h1>
-      <form className="card" style={{ padding: '1.5rem', display: 'grid', gap: '1rem' }} onSubmit={onSubmit}>
+    <div className="mx-auto mt-8 max-w-sm">
+      <h1 className="mb-4 text-center text-2xl font-semibold">{brand.name}</h1>
+      <form className="card grid gap-4 p-6" onSubmit={onSubmit}>
         {mode === 'live' && (
           <div>
             <label className="label" htmlFor="email">Correo</label>
@@ -55,12 +55,12 @@ function LoginForm() {
           />
         </div>
         {error && <p className="field-error" role="alert">{error}</p>}
-        {notice && <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem' }}>{notice}</p>}
+        {notice && <p className="text-sm text-muted">{notice}</p>}
         <button type="submit" className="btn btn--primary" disabled={busy}>
           {busy ? 'Entrando…' : 'Entrar'}
         </button>
         {mode === 'demo' && (
-          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.8rem', textAlign: 'center' }}>
+          <p className="text-center text-xs text-muted">
             Esto <strong>no es seguridad real</strong>: solo una puerta para la demo.
           </p>
         )}
@@ -88,12 +88,12 @@ function AccountPanel() {
   }
 
   return (
-    <div style={{ maxWidth: '30rem', margin: '0 auto' }}>
-      <h1 style={{ marginTop: 0 }}>Cuenta</h1>
-      <div className="card" style={{ padding: '1.5rem', display: 'grid', gap: '1rem' }}>
+    <div className="mx-auto max-w-[30rem]">
+      <h1 className="mb-4 text-2xl font-semibold">Cuenta</h1>
+      <div className="card grid gap-4 p-6">
         <div>
           <span className="label">Sesión</span>
-          <p style={{ margin: 0 }}>
+          <p>
             {identityLabel ?? 'Conectado'} · modo {mode === 'demo' ? 'demo (localStorage)' : 'en vivo (Supabase)'}
           </p>
         </div>
@@ -101,13 +101,13 @@ function AccountPanel() {
         {resetAvailable && (
           <div>
             <span className="label">Datos de ejemplo</span>
-            <button type="button" className="btn btn--ghost" onClick={reset} disabled={busy} style={{ width: '100%' }}>
+            <button type="button" className="btn btn--ghost w-full" onClick={reset} disabled={busy}>
               {busy ? 'Restaurando…' : 'Reiniciar demo'}
             </button>
           </div>
         )}
 
-        <button type="button" className="btn btn--danger" onClick={() => void signOut()} style={{ width: '100%' }}>
+        <button type="button" className="btn btn--danger w-full" onClick={() => void signOut()}>
           Cerrar sesión
         </button>
       </div>

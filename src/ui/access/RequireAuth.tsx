@@ -9,7 +9,7 @@ export function RequireAuth() {
 
   if (status === 'loading') {
     return (
-      <div style={{ minHeight: '60vh', display: 'grid', placeItems: 'center' }}>
+      <div className="grid min-h-[60vh] place-items-center">
         <Spinner />
       </div>
     )

@@ -24,10 +24,9 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      className="btn btn--ghost"
+      className="btn btn--ghost min-w-11 p-0"
       onClick={toggle}
       aria-label={theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
-      style={{ minWidth: '2.75rem', padding: 0 }}
     >
       <Icon path={theme === 'dark' ? SUN : MOON} />
     </button>

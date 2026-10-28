@@ -3,9 +3,9 @@ import type { BrandConfig } from '../../config/brand.config'
 /** Inject the brand palette as CSS variables on <html>. */
 export function applyBrandTheme(brand: BrandConfig): void {
   const root = document.documentElement.style
-  root.setProperty('--brand', brand.palette.primary)
-  root.setProperty('--brand-contrast', brand.palette.primaryContrast)
-  root.setProperty('--accent', brand.palette.accent)
+  root.setProperty('--color-brand', brand.palette.primary)
+  root.setProperty('--color-on-brand', brand.palette.primaryContrast)
+  root.setProperty('--color-accent', brand.palette.accent)
 }
 
 const THEME_KEY = 'pipeline:theme'

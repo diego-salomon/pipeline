@@ -14,14 +14,14 @@ export function BusinessScreen() {
   const whatsappUrl = `https://wa.me/${c.whatsapp.replace(/\D/g, '')}`
 
   return (
-    <div style={{ maxWidth: '40rem', margin: '0 auto', display: 'grid', gap: '1.25rem' }}>
-      <header style={{ textAlign: 'center', padding: '1rem 0' }}>
-        <h1 style={{ margin: 0, fontSize: '2rem' }}>{brand.name}</h1>
-        <p style={{ margin: '0.5rem 0 0', color: 'var(--text-muted)', fontSize: '1.05rem' }}>{brand.tagline}</p>
+    <div className="mx-auto grid max-w-[40rem] gap-5">
+      <header className="py-4 text-center">
+        <h1 className="text-3xl font-bold">{brand.name}</h1>
+        <p className="mt-2 text-lg text-muted">{brand.tagline}</p>
       </header>
 
-      <section className="card" style={{ padding: '1.5rem', display: 'grid', gap: '1rem' }}>
-        <h2 style={{ margin: 0, fontSize: '1.05rem' }}>Contacto</h2>
+      <section className="card grid gap-4 p-6">
+        <h2 className="text-lg font-semibold">Contacto</h2>
         <ContactRow icon={ICONS.pin} label={`${c.address}, ${c.city}, ${c.country}`} href={mapsUrl} />
         <ContactRow icon={ICONS.phone} label={c.phone} href={`tel:${c.phone.replace(/\s/g, '')}`} />
         <ContactRow icon={ICONS.email} label={c.email} href={`mailto:${c.email}`} />
@@ -29,9 +29,9 @@ export function BusinessScreen() {
       </section>
 
       {brand.socials.length > 0 && (
-        <section className="card" style={{ padding: '1.5rem', display: 'grid', gap: '0.75rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1.05rem' }}>Redes</h2>
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <section className="card grid gap-3 p-6">
+          <h2 className="text-lg font-semibold">Redes</h2>
+          <div className="flex flex-wrap gap-3">
             {brand.socials.map((s) => (
               <a key={s.url} className="btn btn--ghost" href={s.url} target="_blank" rel="noreferrer noopener">
                 {s.label}
@@ -51,9 +51,9 @@ function ContactRow({ icon, label, href }: { icon: string; label: string; href: 
       href={href}
       target={external ? '_blank' : undefined}
       rel={external ? 'noreferrer noopener' : undefined}
-      style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}
+      className="flex items-center gap-3 no-underline"
     >
-      <span style={{ color: 'var(--brand)' }}>
+      <span className="text-brand">
         <Icon path={icon} />
       </span>
       <span>{label}</span>

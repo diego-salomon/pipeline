@@ -14,6 +14,8 @@ const TRASH = 'M3 6h18 M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2 M6 6l1 14a2 2 0 0 
 
 const CONTACT_KINDS: HistoryKind[] = ['note', 'call', 'email', 'whatsapp', 'visit']
 
+type Service = ReturnType<typeof useLeadService>
+
 export function LeadDetailScreen() {
   const { id } = useParams()
   const service = useLeadService()
@@ -42,7 +44,7 @@ function LeadDetail({
   onDeleted,
 }: {
   lead: Lead
-  service: ReturnType<typeof useLeadService>
+  service: Service
   reload: () => Promise<void>
   onDeleted: () => void
 }) {
@@ -73,20 +75,20 @@ function LeadDetail({
   }
 
   return (
-    <div style={{ display: 'grid', gap: '1.25rem' }}>
+    <div className="grid gap-5">
       <div>
-        <Link to="/" style={{ color: 'var(--text-muted)', fontSize: '0.875rem', textDecoration: 'none' }}>
+        <Link to="/" className="text-sm text-muted no-underline">
           ← Tablero
         </Link>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+        <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 style={{ margin: 0, fontSize: '1.5rem' }}>{lead.organization}</h1>
-            <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <h1 className="text-2xl font-semibold">{lead.organization}</h1>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
               <StageChip stageId={lead.stage} />
-              <strong style={{ fontSize: '1.05rem' }}>{formatMoney(lead.estimatedValue)}</strong>
+              <strong className="text-lg">{formatMoney(lead.estimatedValue)}</strong>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <div className="flex flex-wrap gap-2">
             {advanceable && (
               <button type="button" className="btn btn--primary" onClick={advance} disabled={busy}>
                 {next && isClosed(stageOrder, next) ? 'Cerrar venta' : 'Mover a la siguiente etapa'}
@@ -99,15 +101,15 @@ function LeadDetail({
           </div>
         </div>
         {closed && (
-          <p style={{ margin: '0.75rem 0 0', color: 'var(--stage-4)', fontWeight: 600 }}>
+          <p className="mt-3 font-semibold" style={{ color: 'var(--stage-4)' }}>
             ✓ {stageLabel(lead.stage)} — no puede avanzar más.
           </p>
         )}
       </div>
 
-      <div style={{ display: 'grid', gap: '1.25rem', gridTemplateColumns: '1fr', alignItems: 'start' }} className="md:grid-cols-2">
+      <div className="grid items-start gap-5 md:grid-cols-2">
         <DetailsForm lead={lead} service={service} reload={reload} />
-        <div style={{ display: 'grid', gap: '1.25rem' }}>
+        <div className="grid gap-5">
           <HistoryComposer lead={lead} service={service} reload={reload} />
           <Timeline lead={lead} />
         </div>
@@ -116,30 +118,14 @@ function LeadDetail({
   )
 }
 
-function DetailsForm({ lead, service, reload }: { lead: Lead; service: ReturnType<typeof useLeadService>; reload: () => Promise<void> }) {
-  const [form, setForm] = useState(() => ({
-    organization: lead.organization,
-    contactName: lead.contactName,
-    phone: lead.phone,
-    email: lead.email,
-    product: lead.product,
-    quantity: String(lead.quantity),
-    estimatedValue: String(lead.estimatedValue),
-  }))
+function DetailsForm({ lead, service, reload }: { lead: Lead; service: Service; reload: () => Promise<void> }) {
+  const [form, setForm] = useState(() => formFromLead(lead))
   const [saving, setSaving] = useState(false)
-  const [savedAt, setSavedAt] = useState<number | null>(null)
+  const [saved, setSaved] = useState(false)
   const [fieldError, setFieldError] = useState<string | null>(null)
 
   useEffect(() => {
-    setForm({
-      organization: lead.organization,
-      contactName: lead.contactName,
-      phone: lead.phone,
-      email: lead.email,
-      product: lead.product,
-      quantity: String(lead.quantity),
-      estimatedValue: String(lead.estimatedValue),
-    })
+    setForm(formFromLead(lead))
   }, [lead])
 
   const f = pipeline.fieldLabels
@@ -160,7 +146,7 @@ function DetailsForm({ lead, service, reload }: { lead: Lead; service: ReturnTyp
         estimatedValue: Number(form.estimatedValue),
       })
       await reload()
-      setSavedAt(Date.now())
+      setSaved(true)
     } catch (err) {
       setFieldError(err instanceof LeadValidationError ? Object.values(err.errors)[0] ?? 'Datos no válidos' : 'No se pudo guardar')
     } finally {
@@ -169,26 +155,38 @@ function DetailsForm({ lead, service, reload }: { lead: Lead; service: ReturnTyp
   }
 
   return (
-    <form className="card" style={{ padding: '1.25rem', display: 'grid', gap: '0.875rem' }} onSubmit={save}>
-      <h2 style={{ margin: 0, fontSize: '1.05rem' }}>Datos</h2>
+    <form className="card grid gap-3.5 p-5" onSubmit={save}>
+      <h2 className="text-lg font-semibold">Datos</h2>
       <Row label={f.organization} value={form.organization} onChange={set('organization')} />
       <Row label={f.contactName} value={form.contactName} onChange={set('contactName')} />
       <Row label={f.phone} value={form.phone} onChange={set('phone')} type="tel" />
       <Row label={f.email} value={form.email} onChange={set('email')} type="email" />
       <Row label={f.product} value={form.product} onChange={set('product')} />
-      <div style={{ display: 'grid', gap: '0.875rem', gridTemplateColumns: '1fr 1fr' }}>
+      <div className="grid grid-cols-2 gap-3.5">
         <Row label={f.quantity} value={form.quantity} onChange={set('quantity')} type="number" min="1" />
         <Row label={f.estimatedValue} value={form.estimatedValue} onChange={set('estimatedValue')} type="number" min="0" />
       </div>
       {fieldError && <p className="field-error">{fieldError}</p>}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', justifyContent: 'flex-end' }}>
-        {savedAt && <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Guardado</span>}
+      <div className="flex items-center justify-end gap-3">
+        {saved && <span className="text-xs text-muted">Guardado</span>}
         <button type="submit" className="btn btn--primary" disabled={saving}>
           {saving ? 'Guardando…' : 'Guardar cambios'}
         </button>
       </div>
     </form>
   )
+}
+
+function formFromLead(lead: Lead) {
+  return {
+    organization: lead.organization,
+    contactName: lead.contactName,
+    phone: lead.phone,
+    email: lead.email,
+    product: lead.product,
+    quantity: String(lead.quantity),
+    estimatedValue: String(lead.estimatedValue),
+  }
 }
 
 function Row({ label, ...rest }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
@@ -203,7 +201,7 @@ function Row({ label, ...rest }: { label: string } & React.InputHTMLAttributes<H
   )
 }
 
-function HistoryComposer({ lead, service, reload }: { lead: Lead; service: ReturnType<typeof useLeadService>; reload: () => Promise<void> }) {
+function HistoryComposer({ lead, service, reload }: { lead: Lead; service: Service; reload: () => Promise<void> }) {
   const [kind, setKind] = useState<HistoryKind>('note')
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
@@ -224,8 +222,8 @@ function HistoryComposer({ lead, service, reload }: { lead: Lead; service: Retur
   }
 
   return (
-    <form className="card" style={{ padding: '1.25rem', display: 'grid', gap: '0.75rem' }} onSubmit={submit}>
-      <h2 style={{ margin: 0, fontSize: '1.05rem' }}>Agregar al historial</h2>
+    <form className="card grid gap-3 p-5" onSubmit={submit}>
+      <h2 className="text-lg font-semibold">Agregar al historial</h2>
       <div>
         <label className="label" htmlFor="composer-kind">Tipo</label>
         <select id="composer-kind" className="select" value={kind} onChange={(e) => setKind(e.target.value as HistoryKind)}>
@@ -246,12 +244,8 @@ function HistoryComposer({ lead, service, reload }: { lead: Lead; service: Retur
           placeholder={simulated ? 'Se registra en el historial — no se envía nada.' : 'Escribe una nota…'}
         />
       </div>
-      {simulated && (
-        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-          Contacto simulado: solo queda registrado en el historial.
-        </p>
-      )}
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      {simulated && <p className="text-xs text-muted">Contacto simulado: solo queda registrado en el historial.</p>}
+      <div className="flex justify-end">
         <button type="submit" className="btn btn--primary" disabled={busy || !text.trim()}>
           {busy ? 'Guardando…' : 'Registrar'}
         </button>
@@ -263,37 +257,29 @@ function HistoryComposer({ lead, service, reload }: { lead: Lead; service: Retur
 function Timeline({ lead }: { lead: Lead }) {
   const entries = [...lead.history].reverse() // newest first
   return (
-    <div className="card" style={{ padding: '1.25rem' }}>
-      <h2 style={{ margin: '0 0 1rem', fontSize: '1.05rem' }}>Historial</h2>
-      <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '1rem' }}>
+    <div className="card p-5">
+      <h2 className="mb-4 text-lg font-semibold">Historial</h2>
+      <ol className="grid gap-4">
         {entries.map((entry) => {
           const def = pipeline.historyKinds[entry.kind]
-          const color = entry.kind === 'stage' ? stageColor(lead.stage) : 'var(--brand)'
+          const color = entry.kind === 'stage' ? stageColor(lead.stage) : 'var(--color-brand)'
           return (
-            <li key={entry.id} style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0.75rem' }}>
+            <li key={entry.id} className="grid grid-cols-[auto_1fr] gap-3">
               <span
                 aria-hidden="true"
-                style={{
-                  width: '2rem',
-                  height: '2rem',
-                  borderRadius: '999px',
-                  display: 'grid',
-                  placeItems: 'center',
-                  background: 'color-mix(in srgb, ' + color + ' 14%, transparent)',
-                  color,
-                  flex: 'none',
-                }}
+                className="grid h-8 w-8 flex-none place-items-center rounded-full"
+                style={{ background: `color-mix(in srgb, ${color} 14%, transparent)`, color }}
               >
                 <Icon path={def.icon} size={16} />
               </span>
               <div>
-                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                  <strong style={{ fontSize: '0.85rem' }}>{def.label}</strong>
-                  <time style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }} dateTime={entry.at}>
+                <div className="flex flex-wrap justify-between gap-2">
+                  <strong className="text-sm">{def.label}</strong>
+                  <time className="text-xs text-muted" dateTime={entry.at}>
                     {formatDateTime(entry.at)}
                   </time>
                 </div>
-                <p style={{ margin: '0.15rem 0 0', fontSize: '0.9rem' }}>{entry.text}</p>
+                <p className="mt-0.5 text-sm">{entry.text}</p>
               </div>
             </li>
           )
