@@ -1,0 +1,227 @@
+@import 'tailwindcss';
+
+/* ───────────────────────────── Design tokens ─────────────────────────────
+   Colors are CSS variables so the brand palette (--brand/--accent) can be
+   injected at runtime from brand.config.ts. Light is the default; dark is
+   applied by prefers-color-scheme OR an explicit [data-theme] on <html>. */
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+
+  /* Brand (overridden at runtime; these are fallbacks). */
+  --brand: #4f46e5;
+  --brand-contrast: #ffffff;
+  --accent: #0ea5e9;
+
+  /* Neutrals / surfaces. */
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef1f5;
+  --text: #1a1d23;
+  --text-muted: #59616e;
+  --border: #e1e5ec;
+  --danger: #dc2626;
+
+  /* Funnel stage accents (mapped by index). */
+  --stage-0: #64748b;
+  --stage-1: #0ea5e9;
+  --stage-2: #f59e0b;
+  --stage-3: #8b5cf6;
+  --stage-4: #10b981;
+
+  --radius: 0.75rem;
+  --radius-sm: 0.5rem;
+  --ring: color-mix(in srgb, var(--brand) 45%, transparent);
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.06), 0 1px 3px rgb(16 24 40 / 0.08);
+  --shadow-md: 0 6px 20px rgb(16 24 40 / 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #0f1115;
+    --surface: #171a21;
+    --surface-2: #1f232c;
+    --text: #e8eaed;
+    --text-muted: #9aa3b2;
+    --border: #2a2f3a;
+    --danger: #f87171;
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+    --shadow-md: 0 6px 20px rgb(0 0 0 / 0.45);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0f1115;
+  --surface: #171a21;
+  --surface-2: #1f232c;
+  --text: #e8eaed;
+  --text-muted: #9aa3b2;
+  --border: #2a2f3a;
+  --danger: #f87171;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 6px 20px rgb(0 0 0 / 0.45);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─────────────────────────── Component classes ─────────────────────────── */
+
+@layer components {
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+    user-select: none;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn--primary {
+    background: var(--brand);
+    color: var(--brand-contrast);
+  }
+  .btn--primary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--brand) 88%, black);
+  }
+
+  .btn--ghost {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+  }
+  .btn--ghost:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+
+  .btn--danger {
+    background: transparent;
+    border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+    color: var(--danger);
+  }
+  .btn--danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--danger) 12%, transparent);
+  }
+
+  .input,
+  .textarea,
+  .select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.625rem 0.75rem;
+    color: var(--text);
+    font: inherit;
+    min-height: 2.75rem;
+  }
+  .textarea {
+    min-height: 5rem;
+    resize: vertical;
+  }
+  .input:focus,
+  .textarea:focus,
+  .select:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--ring);
+  }
+  .input[aria-invalid='true'],
+  .textarea[aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+
+  .label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 0.375rem;
+  }
+
+  .field-error {
+    color: var(--danger);
+    font-size: 0.8125rem;
+    margin-top: 0.25rem;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .chip__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    flex: none;
+  }
+}
