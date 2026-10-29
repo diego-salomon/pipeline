@@ -1,76 +1,73 @@
 @import 'tailwindcss';
 
-/* ───────────────── Dirección: Talonario (ver docs/diseno/DIRECCION.md) ─────
-   Papel copia + azul carbón (tinta) + rojo granate (sello/folios).
-   Filetes en vez de sombras; radios bajos; folios en Courier. */
+/* ───────────────── Look "moderno con carácter" ─────────────────
+   Base clara y espaciosa + pop de color: crema cálido, CTA negro,
+   acento lima neón, números grandes (Bricolage), chips de etapa vivos.
+   Referencias: dashboard claro con pop lima, números hero, pills. */
 
 @theme {
-  --font-sans: 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'Courier Prime', ui-monospace, 'Courier New', monospace;
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Bricolage Grotesque', 'Instrument Sans', sans-serif;
 
-  --color-brand: #223a5e;
-  --color-on-brand: #fbfaf7;
-  --color-accent: #9e2b2b;
+  --color-brand: #1a1a17;
+  --color-on-brand: #f7f5f1;
+  --color-accent: #d8f500;
+  --color-on-accent: #1a1a17;
 
-  --color-canvas: #fbfaf7;
+  --color-canvas: #f4f1ea;
   --color-surface: #ffffff;
-  --color-panel: #f1eee7;
-  --color-fg: #223a5e;
-  --color-muted: #5c6474;
-  --color-border: #d8d5cd;
-  --color-danger: #b3261e;
+  --color-panel: #efeadf;
+  --color-fg: #1a1a17;
+  --color-muted: #6b665c;
+  --color-border: #e5e0d4;
+  --color-danger: #c4302b;
 }
 
 :root {
   color-scheme: light;
-  accent-color: #9e2b2b;
-  caret-color: #223a5e;
+  accent-color: #1a1a17;
+  caret-color: #1a1a17;
 
-  /* Embudo (nivel 2): tonos del propio mundo, distinguibles por tono y valor. */
-  --stage-0: #8a8f98;
-  --stage-1: #4b6a93;
-  --stage-2: #223a5e;
-  --stage-3: #9e2b2b;
-  --stage-4: #4b7a52;
+  /* Etapas en paleta viva (de las referencias de arte). */
+  --stage-0: #4a7bd4;
+  --stage-1: #ef8f3c;
+  --stage-2: #e0579a;
+  --stage-3: #e0a92a;
+  --stage-4: #3fa06a;
 
-  --ring: color-mix(in srgb, var(--color-brand) 40%, transparent);
-  /* Tinta de acento para TEXTO (folios, sellos): se aclara en oscuro. */
-  --color-accent-ink: var(--color-accent);
-  --color-brand-ink: var(--color-brand);
+  /* Tinta de acento para TEXTO (legible; el lima solo va de fondo). */
+  --color-accent-ink: #1a1a17;
+  --ring: color-mix(in srgb, var(--color-fg) 22%, transparent);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --color-canvas: #171a20;
-    --color-surface: #1e232c;
-    --color-panel: #232a34;
-    --color-fg: #ece6d8;
-    --color-muted: #9aa6b5;
-    --color-border: #2e3642;
-    --color-danger: #e0776a;
-    --stage-1: #6e8fbd;
-    --stage-2: #9fb8d8;
-    --color-accent-ink: color-mix(in srgb, var(--color-accent) 62%, white);
-    --color-brand-ink: color-mix(in srgb, var(--color-brand) 62%, white);
-    --stage-4: #6fae78;
+    --color-canvas: #14130f;
+    --color-surface: #1d1b16;
+    --color-panel: #26231c;
+    --color-fg: #f1ede3;
+    --color-muted: #a39c8d;
+    --color-border: #322e26;
+    --color-danger: #e7897f;
+    --color-accent-ink: #f1ede3;
+    accent-color: #d8f500;
+    caret-color: #f1ede3;
   }
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-canvas: #171a20;
-  --color-surface: #1e232c;
-  --color-panel: #232a34;
-  --color-fg: #ece6d8;
-  --color-muted: #9aa6b5;
-  --color-border: #2e3642;
-  --color-danger: #e0776a;
-  --stage-1: #6e8fbd;
-  --stage-2: #9fb8d8;
-  --color-accent-ink: color-mix(in srgb, var(--color-accent) 62%, white);
-  --color-brand-ink: color-mix(in srgb, var(--color-brand) 62%, white);
-  --stage-4: #6fae78;
+  --color-canvas: #14130f;
+  --color-surface: #1d1b16;
+  --color-panel: #26231c;
+  --color-fg: #f1ede3;
+  --color-muted: #a39c8d;
+  --color-border: #322e26;
+  --color-danger: #e7897f;
+  --color-accent-ink: #f1ede3;
+  accent-color: #d8f500;
+  caret-color: #f1ede3;
 }
 
 body {
@@ -79,6 +76,7 @@ body {
   color: var(--color-fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
 }
 
 html,
@@ -87,14 +85,22 @@ body,
   height: 100%;
 }
 
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
 ::selection {
-  background: color-mix(in srgb, var(--color-accent) 28%, transparent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-fg);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 6px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -108,61 +114,35 @@ body,
   }
 }
 
-/* ─── Clases de componente: el talonario hecho piezas ─── */
+/* ─── Componentes ─── */
 
 @layer components {
-  /* Ficha/hoja: filete fino, sin sombra, radio bajo. */
   .card {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 3px;
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgb(26 26 23 / 0.04), 0 2px 8px rgb(26 26 23 / 0.04);
   }
 
-  /* Números de comprobante y cifras: Courier, granate, tabulares. */
-  .folio {
-    font-family: var(--font-mono);
-    color: var(--color-accent-ink);
-    font-variant-numeric: tabular-nums;
-    font-weight: 700;
-  }
-  .num {
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* Sello de etapa (gesto firma): entintado en granate, ligeramente torcido. */
-  .stamp {
-    display: inline-flex;
-    align-items: center;
-    border: 1.5px solid var(--color-accent-ink);
-    color: var(--color-accent-ink);
-    border-radius: 3px;
-    padding: 1px 6px;
-    font: 600 11px/1.2 var(--font-sans);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-  .stamp--tilt {
-    transform: rotate(-3deg);
-  }
-
+  /* Botones tipo pill. */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     min-height: 2.75rem;
-    padding: 0 1rem;
-    border-radius: 2px;
+    padding: 0 1.1rem;
+    border-radius: 999px;
     border: 1px solid transparent;
+    font-family: var(--font-sans);
     font-weight: 600;
     font-size: 0.9375rem;
     cursor: pointer;
-    transition: background-color 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+    transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
     user-select: none;
   }
   .btn:active:not(:disabled) {
-    transform: translateY(0.5px);
+    transform: scale(0.97);
   }
   .btn:disabled {
     opacity: 0.5;
@@ -173,7 +153,14 @@ body,
     color: var(--color-on-brand);
   }
   .btn--primary:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--color-brand) 88%, black);
+    background: color-mix(in srgb, var(--color-brand) 85%, #555);
+  }
+  .btn--accent {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+  .btn--accent:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-accent) 88%, black);
   }
   .btn--ghost {
     background: var(--color-surface);
@@ -185,11 +172,11 @@ body,
   }
   .btn--danger {
     background: transparent;
-    border-color: color-mix(in srgb, var(--color-danger) 45%, transparent);
+    border-color: color-mix(in srgb, var(--color-danger) 40%, transparent);
     color: var(--color-danger);
   }
   .btn--danger:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+    background: color-mix(in srgb, var(--color-danger) 10%, transparent);
   }
 
   .input,
@@ -198,8 +185,8 @@ body,
     width: 100%;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 2px;
-    padding: 0.625rem 0.75rem;
+    border-radius: 12px;
+    padding: 0.7rem 0.85rem;
     color: var(--color-fg);
     font: inherit;
     min-height: 2.75rem;
@@ -212,7 +199,7 @@ body,
   .textarea:focus,
   .select:focus {
     outline: none;
-    border-color: var(--color-brand);
+    border-color: var(--color-fg);
     box-shadow: 0 0 0 3px var(--ring);
   }
   .input[aria-invalid='true'],
@@ -222,10 +209,8 @@ body,
 
   .label {
     display: block;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-size: 0.8125rem;
+    font-weight: 600;
     color: var(--color-muted);
     margin-bottom: 0.375rem;
   }
@@ -235,23 +220,46 @@ body,
     margin-top: 0.25rem;
   }
 
-  /* Pastilla de etapa en el embudo (nivel 2): punto + texto, sin relleno de color. */
+  /* Números: tabulares; grandes en Bricolage. */
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+  .folio {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-muted);
+    font-weight: 600;
+  }
+
+  /* Chip de etapa: pastilla con color vivo (el color se pasa inline). */
   .chip {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.2rem 0.55rem;
-    border-radius: 2px;
-    background: var(--color-panel);
-    border: 1px solid var(--color-border);
-    font-size: 0.8125rem;
+    padding: 0.18rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
     font-weight: 600;
     white-space: nowrap;
+    line-height: 1.4;
   }
   .chip__dot {
     width: 0.5rem;
     height: 0.5rem;
-    border-radius: 2px;
+    border-radius: 999px;
     flex: none;
+  }
+
+  /* Stage como etiqueta coloreada (reemplaza el antiguo "sello"). */
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .stamp--tilt {
+    transform: none;
   }
 }

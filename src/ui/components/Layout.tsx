@@ -19,7 +19,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 // Active state styled with ink tokens so it stays legible in dark mode.
 const navLinkStyle = ({ isActive }: { isActive: boolean }): CSSProperties =>
-  isActive ? { color: 'var(--color-fg)', borderBottomColor: 'var(--color-brand-ink)' } : {}
+  isActive ? { color: 'var(--color-fg)', borderBottomColor: 'var(--color-fg)' } : {}
 
 export function Layout() {
   const { mode, storageWarning } = useServices()

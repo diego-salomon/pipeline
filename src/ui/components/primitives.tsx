@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { brand } from '../../config/brand.config'
-import { stageLabel } from '../stageMeta'
+import { stageChipStyle, stageLabel } from '../stageMeta'
 
 /** Renders a 24×24 stroke icon from SVG path data (supports multiple subpaths). */
 export function Icon({ path, size = 20, className }: { path: string; size?: number; className?: string }) {
@@ -46,10 +46,10 @@ export function EmptyState({ title, description, action }: { title: string; desc
   )
 }
 
-/** Stage shown as an inked rubber stamp (the direction's signature gesture). */
-export function StageStamp({ stageId, tilt = false }: { stageId: string; tilt?: boolean }) {
+/** Stage shown as a soft color-tinted pill. */
+export function StageStamp({ stageId }: { stageId: string; tilt?: boolean }) {
   return (
-    <span className={tilt ? 'stamp stamp--tilt' : 'stamp'} data-testid="stage-chip">
+    <span className="stamp" data-testid="stage-chip" style={stageChipStyle(stageId)}>
       {stageLabel(stageId)}
     </span>
   )
