@@ -16,7 +16,7 @@
 
 <br>
 
-<img src="docs/assets/board.png" width="840" alt="The CRM board: money in play and money won at the top, a 'for today' list that surfaces the coldest leads first, and a funnel split by stage." />
+<img src="docs/assets/board.png" width="880" alt="The funnel: every lead laid out by stage, each card showing the amount in play, the stage, and how long since it was last touched." />
 
 </div>
 
@@ -30,12 +30,8 @@ Neutral Latin-American Spanish out of the box. Mobile-first, light and dark, WCA
 
 <div align="center">
 <br>
-<table>
-<tr>
-<td align="center" width="62%"><img src="docs/assets/board.png" alt="The board on desktop" /><br><sub>The board, on desktop</sub></td>
-<td align="center" width="38%"><img src="docs/assets/board-mobile.png" alt="The same board on a phone" /><br><sub>Built for the phone</sub></td>
-</tr>
-</table>
+<img src="docs/assets/board-mobile.png" width="300" alt="The board on a phone: money in play and money won, the day's leads with their amounts, and the funnel below." />
+<br><sub>Built for the phone</sub>
 </div>
 
 ## White-label: two files
