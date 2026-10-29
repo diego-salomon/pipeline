@@ -43,9 +43,6 @@ function renderBoard(service: LeadService) {
   )
 }
 
-const FIRST = pipeline.stages[0].label
-const SECOND = pipeline.stages[1].label
-
 describe('BoardScreen', () => {
   it('renders seeded leads', async () => {
     const service = makeService()
@@ -54,8 +51,9 @@ describe('BoardScreen', () => {
 
     renderBoard(service)
 
-    expect(await screen.findByText('Comercializadora Alfa')).toBeInTheDocument()
-    expect(screen.getByText('Distribuidora Beta')).toBeInTheDocument()
+    // Each open lead now shows in both "Para hoy" and the funnel column.
+    expect((await screen.findAllByText('Comercializadora Alfa')).length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Distribuidora Beta').length).toBeGreaterThan(0)
   })
 
   it('advances a lead to the next stage column', async () => {
@@ -63,17 +61,21 @@ describe('BoardScreen', () => {
     await service.create(draft('Comercializadora Alfa'))
 
     renderBoard(service)
-    await screen.findByText('Comercializadora Alfa')
+    await screen.findAllByText('Comercializadora Alfa')
+
+    const firstColumn = () => screen.getByTestId(`col-${stageOrder[0]}`)
+    const secondColumn = () => screen.getByTestId(`col-${stageOrder[1]}`)
+
+    // Before: the first column holds the lead; the second is empty.
+    expect(within(firstColumn()).queryByText('Sin registros')).toBeNull()
+    expect(within(secondColumn()).getByText('Sin registros')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: /mover a la siguiente etapa/i }))
 
+    // After: the lead left the first column (now empty) and the second filled.
     await waitFor(() => {
-      const section = screen.getByRole('heading', { name: SECOND }).closest('section')
-      expect(section).not.toBeNull()
-      expect(within(section as HTMLElement).getByText('Comercializadora Alfa')).toBeInTheDocument()
+      expect(within(firstColumn()).getByText('Sin registros')).toBeInTheDocument()
+      expect(within(secondColumn()).queryByText('Sin registros')).toBeNull()
     })
-
-    const firstSection = screen.getByRole('heading', { name: FIRST }).closest('section') as HTMLElement
-    expect(within(firstSection).queryByText('Comercializadora Alfa')).toBeNull()
   })
 })

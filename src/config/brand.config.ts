@@ -56,9 +56,10 @@ export const brand: BrandConfig = {
   locale: 'es-419',
   currency: 'USD',
   palette: {
-    primary: '#4f46e5',
-    primaryContrast: '#ffffff',
-    accent: '#0ea5e9',
+    // Dirección "Talonario": azul carbón (tinta) + rojo granate (sello/folios).
+    primary: '#223A5E',
+    primaryContrast: '#FBFAF7',
+    accent: '#9E2B2B',
   },
   contact: {
     address: 'Av. Principal 123, Piso 4',
