@@ -34,6 +34,9 @@
   --stage-4: #4b7a52;
 
   --ring: color-mix(in srgb, var(--color-brand) 40%, transparent);
+  /* Tinta de acento para TEXTO (folios, sellos): se aclara en oscuro. */
+  --color-accent-ink: var(--color-accent);
+  --color-brand-ink: var(--color-brand);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -48,6 +51,9 @@
     --color-danger: #e0776a;
     --stage-1: #6e8fbd;
     --stage-2: #9fb8d8;
+    --color-accent-ink: color-mix(in srgb, var(--color-accent) 62%, white);
+    --color-brand-ink: color-mix(in srgb, var(--color-brand) 62%, white);
+    --stage-4: #6fae78;
   }
 }
 
@@ -62,6 +68,9 @@
   --color-danger: #e0776a;
   --stage-1: #6e8fbd;
   --stage-2: #9fb8d8;
+  --color-accent-ink: color-mix(in srgb, var(--color-accent) 62%, white);
+  --color-brand-ink: color-mix(in srgb, var(--color-brand) 62%, white);
+  --stage-4: #6fae78;
 }
 
 body {
@@ -112,7 +121,7 @@ body,
   /* Números de comprobante y cifras: Courier, granate, tabulares. */
   .folio {
     font-family: var(--font-mono);
-    color: var(--color-accent);
+    color: var(--color-accent-ink);
     font-variant-numeric: tabular-nums;
     font-weight: 700;
   }
@@ -124,8 +133,8 @@ body,
   .stamp {
     display: inline-flex;
     align-items: center;
-    border: 1.5px solid var(--color-accent);
-    color: var(--color-accent);
+    border: 1.5px solid var(--color-accent-ink);
+    color: var(--color-accent-ink);
     border-radius: 3px;
     padding: 1px 6px;
     font: 600 11px/1.2 var(--font-sans);

@@ -51,18 +51,16 @@ export function BoardScreen() {
 
   return (
     <div className="grid gap-6">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-xl font-semibold">Tablero</h1>
-        <Link to="/leads/new" className="btn btn--primary">
-          Nueva {pipeline.entity.singular}
-        </Link>
-      </div>
-
       {/* Nivel 1 — Para hoy (talonario). */}
       <section className="card overflow-hidden">
-        <header className="flex items-baseline justify-between border-b border-border px-4 py-3">
-          <h2 className="text-sm font-bold uppercase tracking-wide">Para hoy</h2>
-          <span className="text-xs text-muted">los más fríos primero</span>
+        <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+          <div>
+            <h1 className="text-sm font-bold uppercase tracking-wide">Para hoy</h1>
+            <span className="text-xs text-muted">los más fríos primero</span>
+          </div>
+          <Link to="/leads/new" className="btn btn--ghost" aria-label={`Nueva ${pipeline.entity.singular}`}>
+            Nueva
+          </Link>
         </header>
         <ol>
           {paraHoy.map((lead, i) => {
@@ -80,7 +78,12 @@ export function BoardScreen() {
                     <span className="num whitespace-nowrap font-bold">{formatMoney(lead.estimatedValue)}</span>
                   </div>
                   <div className="mt-1.5 flex flex-wrap items-center gap-2 pl-9">
-                    <span className="stamp">{stageLabel(lead.stage)}</span>
+                    <span
+                      className="text-xs font-bold uppercase tracking-wide"
+                      style={{ color: 'var(--color-accent-ink)' }}
+                    >
+                      {stageLabel(lead.stage)}
+                    </span>
                     <span className="text-xs text-muted">
                       {activity ? `sin tocar ${formatRelative(activity)}` : 'sin actividad'}
                     </span>

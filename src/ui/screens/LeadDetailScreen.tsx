@@ -274,7 +274,7 @@ function Timeline({ lead }: { lead: Lead }) {
                   <div className="flex items-center justify-between gap-2">
                     <span
                       className="text-xs font-bold uppercase tracking-wide"
-                      style={{ color: isStage ? 'var(--color-accent)' : 'var(--color-muted)' }}
+                      style={{ color: isStage ? 'var(--color-accent-ink)' : 'var(--color-muted)' }}
                     >
                       {def.label}
                     </span>

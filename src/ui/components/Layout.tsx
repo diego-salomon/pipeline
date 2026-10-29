@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { brand } from '../../config/brand.config'
 import { useServices } from '../app/ServiceContext'
@@ -12,9 +13,13 @@ const NAV = [
 ]
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `border-b-2 px-0.5 py-1.5 text-sm font-semibold no-underline ${
-    isActive ? 'border-brand text-brand' : 'border-transparent text-muted'
+  `border-b-2 px-0.5 py-2.5 text-sm font-semibold no-underline ${
+    isActive ? '' : 'border-transparent text-muted'
   }`
+
+// Active state styled with ink tokens so it stays legible in dark mode.
+const navLinkStyle = ({ isActive }: { isActive: boolean }): CSSProperties =>
+  isActive ? { color: 'var(--color-fg)', borderBottomColor: 'var(--color-brand-ink)' } : {}
 
 export function Layout() {
   const { mode, storageWarning } = useServices()
@@ -36,7 +41,7 @@ export function Layout() {
 
           <nav className="ml-auto flex items-center gap-4">
             {NAV.map((item) => (
-              <NavLink key={item.to} to={item.to} end={item.end} className={navLinkClass}>
+              <NavLink key={item.to} to={item.to} end={item.end} className={navLinkClass} style={navLinkStyle}>
                 {item.label}
               </NavLink>
             ))}
