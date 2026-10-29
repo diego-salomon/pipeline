@@ -6,13 +6,14 @@ import { pipeline } from '../../config/pipeline.config'
 import { useLeadService } from '../app/ServiceContext'
 import { useLead } from '../app/useLeads'
 import { formatDateTime, formatMoney } from '../format'
-import { stageColor, stageLabel, stageOrder } from '../stageMeta'
-import { EmptyState, Icon, Spinner, StageChip } from '../components/primitives'
+import { stageLabel, stageOrder } from '../stageMeta'
+import { EmptyState, Icon, Spinner, StageStamp } from '../components/primitives'
 
 const ARROW = 'M5 12h14 M13 6l6 6-6 6'
 const TRASH = 'M3 6h18 M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2 M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14'
 
 const CONTACT_KINDS: HistoryKind[] = ['note', 'call', 'email', 'whatsapp', 'visit']
+const SECTION_HEAD = 'text-sm font-bold uppercase tracking-wide'
 
 type Service = ReturnType<typeof useLeadService>
 
@@ -84,8 +85,8 @@ function LeadDetail({
           <div>
             <h1 className="text-2xl font-semibold">{lead.organization}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-3">
-              <StageChip stageId={lead.stage} />
-              <strong className="text-lg">{formatMoney(lead.estimatedValue)}</strong>
+              <StageStamp stageId={lead.stage} tilt />
+              <strong className="num text-lg">{formatMoney(lead.estimatedValue)}</strong>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -156,7 +157,7 @@ function DetailsForm({ lead, service, reload }: { lead: Lead; service: Service; 
 
   return (
     <form className="card grid gap-3.5 p-5" onSubmit={save}>
-      <h2 className="text-lg font-semibold">Datos</h2>
+      <h2 className={SECTION_HEAD}>Datos</h2>
       <Row label={f.organization} value={form.organization} onChange={set('organization')} />
       <Row label={f.contactName} value={form.contactName} onChange={set('contactName')} />
       <Row label={f.phone} value={form.phone} onChange={set('phone')} type="tel" />
@@ -223,7 +224,7 @@ function HistoryComposer({ lead, service, reload }: { lead: Lead; service: Servi
 
   return (
     <form className="card grid gap-3 p-5" onSubmit={submit}>
-      <h2 className="text-lg font-semibold">Agregar al historial</h2>
+      <h2 className={SECTION_HEAD}>Agregar al historial</h2>
       <div>
         <label className="label" htmlFor="composer-kind">Tipo</label>
         <select id="composer-kind" className="select" value={kind} onChange={(e) => setKind(e.target.value as HistoryKind)}>
@@ -255,31 +256,34 @@ function HistoryComposer({ lead, service, reload }: { lead: Lead; service: Servi
 }
 
 function Timeline({ lead }: { lead: Lead }) {
+  const total = lead.history.length
   const entries = [...lead.history].reverse() // newest first
   return (
     <div className="card p-5">
-      <h2 className="mb-4 text-lg font-semibold">Historial</h2>
-      <ol className="grid gap-4">
-        {entries.map((entry) => {
+      <h2 className={`mb-3 ${SECTION_HEAD}`}>Historial</h2>
+      <ol>
+        {entries.map((entry, i) => {
           const def = pipeline.historyKinds[entry.kind]
-          const color = entry.kind === 'stage' ? stageColor(lead.stage) : 'var(--color-brand)'
+          const folio = String(total - i).padStart(3, '0')
+          const isStage = entry.kind === 'stage'
           return (
-            <li key={entry.id} className="grid grid-cols-[auto_1fr] gap-3">
-              <span
-                aria-hidden="true"
-                className="grid h-8 w-8 flex-none place-items-center rounded-full"
-                style={{ background: `color-mix(in srgb, ${color} 14%, transparent)`, color }}
-              >
-                <Icon path={def.icon} size={16} />
-              </span>
-              <div>
-                <div className="flex flex-wrap justify-between gap-2">
-                  <strong className="text-sm">{def.label}</strong>
-                  <time className="text-xs text-muted" dateTime={entry.at}>
-                    {formatDateTime(entry.at)}
-                  </time>
+            <li key={entry.id} className="border-b border-border py-2.5 last:border-b-0 last:pb-0">
+              <div className="flex items-baseline gap-3">
+                <span className="folio text-xs">{folio}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span
+                      className="text-xs font-bold uppercase tracking-wide"
+                      style={{ color: isStage ? 'var(--color-accent)' : 'var(--color-muted)' }}
+                    >
+                      {def.label}
+                    </span>
+                    <time className="num text-xs text-muted" dateTime={entry.at}>
+                      {formatDateTime(entry.at)}
+                    </time>
+                  </div>
+                  <p className="mt-0.5 text-sm">{entry.text}</p>
                 </div>
-                <p className="mt-0.5 text-sm">{entry.text}</p>
               </div>
             </li>
           )

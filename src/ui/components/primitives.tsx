@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { brand } from '../../config/brand.config'
-import { stageColor, stageLabel } from '../stageMeta'
+import { stageLabel } from '../stageMeta'
 
 /** Renders a 24×24 stroke icon from SVG path data (supports multiple subpaths). */
 export function Icon({ path, size = 20, className }: { path: string; size?: number; className?: string }) {
@@ -27,7 +27,7 @@ export function Spinner({ label = 'Cargando…' }: { label?: string }) {
     <div role="status" className="flex items-center justify-center gap-2 py-8 text-muted">
       <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
         <circle cx="12" cy="12" r="9" fill="none" stroke="var(--color-border)" strokeWidth="3" />
-        <path d="M21 12a9 9 0 0 0-9-9" fill="none" stroke="var(--color-brand)" strokeWidth="3" strokeLinecap="round">
+        <path d="M21 12a9 9 0 0 0-9-9" fill="none" stroke="var(--color-accent)" strokeWidth="3" strokeLinecap="round">
           <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite" />
         </path>
       </svg>
@@ -46,10 +46,10 @@ export function EmptyState({ title, description, action }: { title: string; desc
   )
 }
 
-export function StageChip({ stageId }: { stageId: string }) {
+/** Stage shown as an inked rubber stamp (the direction's signature gesture). */
+export function StageStamp({ stageId, tilt = false }: { stageId: string; tilt?: boolean }) {
   return (
-    <span className="chip" data-testid="stage-chip">
-      <span className="chip__dot" style={{ background: stageColor(stageId) }} />
+    <span className={tilt ? 'stamp stamp--tilt' : 'stamp'} data-testid="stage-chip">
       {stageLabel(stageId)}
     </span>
   )
@@ -61,7 +61,7 @@ export function Logo() {
   }
   return (
     <span className="inline-flex items-center gap-2 font-extrabold tracking-tight">
-      <span aria-hidden="true" className="inline-block h-6 w-6 rounded-[0.45rem] bg-brand" />
+      <span aria-hidden="true" className="inline-block h-6 w-6 bg-brand" style={{ borderRadius: '2px' }} />
       {brand.name}
     </span>
   )
