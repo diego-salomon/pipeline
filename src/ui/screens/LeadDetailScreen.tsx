@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { canAdvance, isClosed, LeadValidationError, nextStage } from '../../domain'
-import type { HistoryKind, Lead } from '../../domain/types'
+import type { HistoryEntry, HistoryKind, Lead } from '../../domain/types'
 import { pipeline } from '../../config/pipeline.config'
-import { useLeadService } from '../app/ServiceContext'
+import { useLeadService, useServices } from '../app/ServiceContext'
 import { useLead } from '../app/useLeads'
 import { formatDateTime, formatMoney } from '../format'
 import { stageLabel, stageOrder } from '../stageMeta'
@@ -112,6 +112,7 @@ function LeadDetail({
         <DetailsForm lead={lead} service={service} reload={reload} />
         <div className="grid gap-5">
           <HistoryComposer lead={lead} service={service} reload={reload} />
+          <CallAnalysisPanel lead={lead} service={service} reload={reload} />
           <Timeline lead={lead} />
         </div>
       </div>
@@ -255,6 +256,104 @@ function HistoryComposer({ lead, service, reload }: { lead: Lead; service: Servi
   )
 }
 
+const MIC = pipeline.historyKinds['call-analysis'].icon
+
+function CallAnalysisPanel({ lead, service, reload }: { lead: Lead; service: Service; reload: () => Promise<void> }) {
+  const { mode } = useServices()
+  const [phase, setPhase] = useState<'idle' | 'recording' | 'analyzing'>('idle')
+  const [error, setError] = useState<string | null>(null)
+  const recorderRef = useRef<MediaRecorder | null>(null)
+  const chunksRef = useRef<Blob[]>([])
+
+  const canRecord =
+    typeof window !== 'undefined' && 'MediaRecorder' in window && !!navigator.mediaDevices?.getUserMedia
+  // Live + mic available → record real audio; otherwise simulate (demo).
+  const liveRecording = mode === 'live' && canRecord
+
+  const analyze = async (audio?: Blob) => {
+    setPhase('analyzing')
+    setError(null)
+    try {
+      await service.analyzeCall(lead.id, audio)
+      await reload()
+      setPhase('idle')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo analizar la llamada')
+      setPhase('idle')
+    }
+  }
+
+  const startRecording = async () => {
+    setError(null)
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+      chunksRef.current = []
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data)
+      }
+      recorder.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop())
+        void analyze(new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' }))
+      }
+      recorderRef.current = recorder
+      recorder.start()
+      setPhase('recording')
+    } catch {
+      setError('No se pudo acceder al micrófono')
+    }
+  }
+
+  const stopRecording = () => {
+    recorderRef.current?.stop()
+    recorderRef.current = null
+  }
+
+  const busy = phase === 'analyzing'
+
+  return (
+    <div className="card grid gap-3 p-5">
+      <h2 className={SECTION_HEAD}>Grabar y analizar llamada</h2>
+      <p className="text-xs text-muted">
+        {liveRecording
+          ? 'En altavoz, el micrófono capta ambos lados. Al detener, se transcribe y se analiza la venta.'
+          : 'Se simula una llamada grabada: se transcribe y se analiza, y queda en el historial como comprobante.'}
+      </p>
+
+      {phase === 'recording' ? (
+        <div className="flex items-center justify-between gap-3">
+          <span className="flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--color-accent-ink)' }}>
+            <span
+              aria-hidden="true"
+              className="inline-block h-2.5 w-2.5 animate-pulse"
+              style={{ background: 'var(--color-accent-ink)', borderRadius: '2px' }}
+            />
+            Grabando…
+          </span>
+          <button type="button" className="btn btn--primary" onClick={stopRecording}>
+            Detener y analizar
+            <Icon path={MIC} size={16} />
+          </button>
+        </div>
+      ) : (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={liveRecording ? startRecording : () => void analyze()}
+            disabled={busy}
+          >
+            {busy ? 'Analizando…' : liveRecording ? 'Grabar llamada' : 'Simular llamada y analizar'}
+            {!busy && <Icon path={MIC} size={16} />}
+          </button>
+        </div>
+      )}
+
+      {error && <p className="field-error">{error}</p>}
+    </div>
+  )
+}
+
 function Timeline({ lead }: { lead: Lead }) {
   const total = lead.history.length
   const entries = [...lead.history].reverse() // newest first
@@ -266,6 +365,7 @@ function Timeline({ lead }: { lead: Lead }) {
           const def = pipeline.historyKinds[entry.kind]
           const folio = String(total - i).padStart(3, '0')
           const isStage = entry.kind === 'stage'
+          const accent = isStage || entry.kind === 'call-analysis'
           return (
             <li key={entry.id} className="border-b border-border py-2.5 last:border-b-0 last:pb-0">
               <div className="flex items-baseline gap-3">
@@ -274,7 +374,7 @@ function Timeline({ lead }: { lead: Lead }) {
                   <div className="flex items-center justify-between gap-2">
                     <span
                       className="text-xs font-bold uppercase tracking-wide"
-                      style={{ color: isStage ? 'var(--color-accent-ink)' : 'var(--color-muted)' }}
+                      style={{ color: accent ? 'var(--color-accent-ink)' : 'var(--color-muted)' }}
                     >
                       {def.label}
                     </span>
@@ -283,12 +383,57 @@ function Timeline({ lead }: { lead: Lead }) {
                     </time>
                   </div>
                   <p className="mt-0.5 text-sm">{entry.text}</p>
+                  {entry.call && <CallAnalysisDetail call={entry.call} />}
                 </div>
               </div>
             </li>
           )
         })}
       </ol>
+    </div>
+  )
+}
+
+function CallAnalysisDetail({ call }: { call: NonNullable<HistoryEntry['call']> }) {
+  const { analysis, transcript, durationSeconds } = call
+  const sections: { title: string; items: string[] }[] = [
+    { title: 'A mejorar', items: analysis.improvements },
+    { title: 'Seguir', items: analysis.followUps },
+    { title: 'Ofrecer', items: analysis.offers },
+    { title: 'Próximos pasos', items: analysis.nextSteps },
+  ].filter((s) => s.items.length > 0)
+
+  return (
+    <div className="mt-2 grid gap-3">
+      {sections.map((s) => (
+        <div key={s.title}>
+          <div
+            className="mb-1 text-xs font-bold uppercase tracking-wide"
+            style={{ color: 'var(--color-accent-ink)' }}
+          >
+            {s.title}
+          </div>
+          <ul className="grid gap-1">
+            {s.items.map((item, idx) => (
+              <li key={idx} className="flex gap-2 text-sm">
+                <span className="num text-xs text-muted">{String(idx + 1).padStart(2, '0')}</span>
+                <span className="min-w-0 flex-1">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <details className="mt-1">
+        <summary className="cursor-pointer text-xs font-bold uppercase tracking-wide text-muted">
+          Transcripción{durationSeconds ? ` · ${Math.round(durationSeconds / 60)} min` : ''}
+        </summary>
+        <pre
+          className="num mt-2 whitespace-pre-wrap border-l border-border pl-3 text-xs text-muted"
+          style={{ fontFamily: 'var(--font-mono, monospace)' }}
+        >
+          {transcript}
+        </pre>
+      </details>
     </div>
   )
 }

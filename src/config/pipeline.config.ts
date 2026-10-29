@@ -52,6 +52,7 @@ const ICONS = {
   visit: 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z M12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z',
   whatsapp: 'M12 2a10 10 0 0 0-8.6 15l-1.3 4 4.1-1.3A10 10 0 1 0 12 2Z M8.5 7.5c.3 0 .6.2.8.6l.7 1.5c.1.3 0 .6-.2.8l-.5.5c.6 1.1 1.5 2 2.6 2.6l.5-.5c.2-.2.5-.3.8-.2l1.5.7c.4.2.6.5.6.8 0 1.2-1 2.2-2.2 2a9 9 0 0 1-7.2-7.2c-.2-1.2.8-2.2 2-2.2Z',
   stage: 'M5 12h14 M13 6l6 6-6 6',
+  'call-analysis': 'M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z M5 11a7 7 0 0 0 14 0 M12 18v3',
 } as const
 
 export const pipeline: PipelineConfig = {
@@ -80,6 +81,7 @@ export const pipeline: PipelineConfig = {
     visit: { label: 'Visita', icon: ICONS.visit },
     whatsapp: { label: 'WhatsApp', icon: ICONS.whatsapp },
     stage: { label: 'Cambio de etapa', icon: ICONS.stage },
+    'call-analysis': { label: 'Llamada analizada', icon: ICONS['call-analysis'] },
   },
 }
 

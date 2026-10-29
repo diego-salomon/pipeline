@@ -1,7 +1,7 @@
 /** Row ⇄ domain mapping for the Supabase tables. */
 
 import { sortHistoryAsc } from '../../domain/history'
-import type { HistoryEntry, Lead } from '../../domain/types'
+import type { CallRecordingAnalysis, HistoryEntry, Lead } from '../../domain/types'
 
 export interface LeadRow {
   id: string
@@ -25,6 +25,8 @@ export interface HistoryRow {
   kind: HistoryEntry['kind']
   text: string
   at: string
+  /** Structured payload for `call-analysis` entries; null otherwise. */
+  data: CallRecordingAnalysis | null
 }
 
 export function toLead(row: LeadRow, history: HistoryRow[]): Lead {
@@ -39,7 +41,13 @@ export function toLead(row: LeadRow, history: HistoryRow[]): Lead {
     estimatedValue: Number(row.estimated_value),
     stage: row.stage,
     history: sortHistoryAsc(
-      history.map((h) => ({ id: h.id, kind: h.kind, text: h.text, at: h.at })),
+      history.map((h) => ({
+        id: h.id,
+        kind: h.kind,
+        text: h.text,
+        at: h.at,
+        ...(h.data ? { call: h.data } : {}),
+      })),
     ),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -71,5 +79,6 @@ export function toHistoryRows(lead: Lead, tenantId: string): HistoryRow[] {
     kind: h.kind,
     text: h.text,
     at: h.at,
+    data: h.call ?? null,
   }))
 }

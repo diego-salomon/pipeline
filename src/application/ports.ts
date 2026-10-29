@@ -9,7 +9,7 @@
  * and synchronous — only this I/O boundary is async.
  */
 
-import type { Lead } from '../domain/types'
+import type { CallRecordingAnalysis, Lead } from '../domain/types'
 
 export interface LeadRepository {
   list(): Promise<Lead[]>
@@ -17,6 +17,34 @@ export interface LeadRepository {
   save(lead: Lead): Promise<void>
   remove(id: string): Promise<boolean>
   resetToSeed(): Promise<void>
+}
+
+/** Context passed to the analyzer so its coaching is grounded in the deal. */
+export interface CallContext {
+  organization: string
+  contactName: string
+  product: string
+  stageLabel: string
+}
+
+/** A recorded call to transcribe + analyze. */
+export interface CallInput {
+  /**
+   * The recorded audio. Optional: the demo adapter simulates without real
+   * audio, and a live adapter may obtain audio through another channel.
+   */
+  audio?: Blob
+  context: CallContext
+}
+
+/**
+ * Transcribes a sales call and analyzes it for coaching + next actions. The
+ * second I/O seam (alongside LeadRepository): a demo adapter simulates it, a
+ * live adapter wires real transcription (e.g. Grabar Llamada / mlx-whisper) and
+ * an LLM. The domain never depends on this — only the service does.
+ */
+export interface CallAnalysisProvider {
+  analyzeCall(input: CallInput): Promise<CallRecordingAnalysis>
 }
 
 /** Returns an ISO 8601 timestamp for "now". */

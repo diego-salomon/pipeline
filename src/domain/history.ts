@@ -1,6 +1,6 @@
 /** Pure history-timeline logic. */
 
-import type { HistoryEntry, HistoryKind } from './types'
+import type { CallRecordingAnalysis, HistoryEntry, HistoryKind } from './types'
 
 export interface NewEntryInput {
   id: string
@@ -20,6 +20,36 @@ export function makeHistoryEntry(input: NewEntryInput): HistoryEntry {
     throw new Error('History entry text cannot be empty')
   }
   return { id: input.id, kind: input.kind, text, at: input.at }
+}
+
+export interface NewCallAnalysisInput {
+  id: string
+  /** ISO 8601 timestamp. */
+  at: string
+  call: CallRecordingAnalysis
+}
+
+/**
+ * Build a validated `call-analysis` entry. The transcript must not be blank
+ * (an empty transcript means nothing was recorded) and the entry's text is the
+ * analysis summary, so it reads in the timeline like any other entry.
+ */
+export function makeCallAnalysisEntry(input: NewCallAnalysisInput): HistoryEntry {
+  const transcript = input.call.transcript.trim()
+  if (transcript.length === 0) {
+    throw new Error('Call transcript cannot be empty')
+  }
+  const summary = input.call.analysis.summary.trim()
+  if (summary.length === 0) {
+    throw new Error('Call analysis summary cannot be empty')
+  }
+  return {
+    id: input.id,
+    kind: 'call-analysis',
+    text: summary,
+    at: input.at,
+    call: { ...input.call, transcript, analysis: { ...input.call.analysis, summary } },
+  }
 }
 
 /**

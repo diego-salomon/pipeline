@@ -1,7 +1,7 @@
 /** Pure lead operations. Every function returns a new Lead; none mutate. */
 
-import type { HistoryKind, Lead, LeadDraft, LeadFieldsPatch, StageId } from './types'
-import { appendHistory, makeHistoryEntry } from './history'
+import type { CallRecordingAnalysis, HistoryKind, Lead, LeadDraft, LeadFieldsPatch, StageId } from './types'
+import { appendHistory, makeCallAnalysisEntry, makeHistoryEntry } from './history'
 import { nextStage } from './stages'
 import { LeadValidationError, validateLeadDraft } from './validation'
 
@@ -88,6 +88,17 @@ export function addNote(lead: Lead, text: string, deps: EntryDeps): Lead {
  */
 export function logContact(lead: Lead, kind: HistoryKind, text: string, deps: EntryDeps): Lead {
   const entry = makeHistoryEntry({ id: deps.id, kind, at: deps.now, text })
+  return { ...lead, history: appendHistory(lead.history, entry), updatedAt: deps.now }
+}
+
+/**
+ * Attach a transcribed + analyzed call to the timeline as a `call-analysis`
+ * entry. The transcript and analysis are produced outside the domain (by the
+ * call-analysis port); this only validates and records the result. Throws if
+ * the transcript or the analysis summary is empty.
+ */
+export function attachCallAnalysis(lead: Lead, call: CallRecordingAnalysis, deps: EntryDeps): Lead {
+  const entry = makeCallAnalysisEntry({ id: deps.id, at: deps.now, call })
   return { ...lead, history: appendHistory(lead.history, entry), updatedAt: deps.now }
 }
 

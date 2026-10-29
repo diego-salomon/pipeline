@@ -1,9 +1,29 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createLeadService, type LeadService } from '../leadService'
+import type { CallAnalysisProvider } from '../ports'
 import { createInMemoryLeadRepository } from '../../infrastructure/inMemoryLeadRepository'
 import type { LeadDraft } from '../../domain/types'
 
 const order = ['nuevo', 'cotizado', 'cerrado']
+
+/** A deterministic analyzer: echoes the context into a fixed-shape result. */
+function fakeCallAnalysis(): CallAnalysisProvider {
+  return {
+    async analyzeCall(input) {
+      return {
+        transcript: `Vendedor: Hola.\n${input.context.contactName}: Lo estamos viendo.`,
+        durationSeconds: 60,
+        analysis: {
+          summary: `Llamada con ${input.context.contactName} sobre ${input.context.product}`,
+          improvements: ['Cuantificar el valor antes del precio'],
+          followUps: ['Objeción de precio'],
+          offers: ['Descuento por volumen'],
+          nextSteps: ['Enviar propuesta'],
+        },
+      }
+    },
+  }
+}
 
 const draft: LeadDraft = {
   organization: 'Distribuidora Sur',
@@ -25,6 +45,7 @@ function makeService(): LeadService {
     now: () => `2026-01-01T00:00:${String(t++).padStart(2, '0')}.000Z`,
     stageOrder: order,
     stageLabel: (id) => id.toUpperCase(),
+    callAnalysis: fakeCallAnalysis(),
   })
 }
 
@@ -67,6 +88,23 @@ describe('leadService', () => {
     expect((await svc.get(lead.id))?.estimatedValue).toBe(1500)
   })
 
+  it('analyzes a call and attaches transcript + analysis to the history', async () => {
+    const lead = await svc.create(draft)
+    const updated = await svc.analyzeCall(lead.id)
+    const entry = updated.history.find((h) => h.kind === 'call-analysis')
+    expect(entry).toBeDefined()
+    expect(entry?.text).toContain('Carla Ruiz')
+    expect(entry?.call?.transcript).toContain('Vendedor')
+    expect(entry?.call?.analysis.nextSteps).toContain('Enviar propuesta')
+    // Persisted, not just returned.
+    const fresh = await svc.get(lead.id)
+    expect(fresh?.history.some((h) => h.kind === 'call-analysis')).toBe(true)
+  })
+
+  it('throws when analyzing a call on a missing lead', async () => {
+    await expect(svc.analyzeCall('ghost')).rejects.toThrow()
+  })
+
   it('removes a lead', async () => {
     const lead = await svc.create(draft)
     expect(await svc.remove(lead.id)).toBe(true)
@@ -82,6 +120,7 @@ describe('leadService', () => {
       now: () => 'now',
       stageOrder: order,
       stageLabel: (id) => id,
+      callAnalysis: fakeCallAnalysis(),
     })
     await seeded.remove('seed-1')
     expect(await seeded.list()).toHaveLength(0)

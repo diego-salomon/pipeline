@@ -11,6 +11,7 @@ import { createLocalStorageLeadRepository, isLocalStorageAvailable } from './inf
 import { demoSeed } from './infrastructure/seed'
 import { systemClock } from './infrastructure/clock'
 import { uuid } from './infrastructure/id'
+import { createDemoCallAnalysisProvider } from './infrastructure/demoCallAnalysisProvider'
 import { createSupabaseClient } from './infrastructure/supabase/client'
 import { DemoAuthProvider } from './ui/access/DemoAuthProvider'
 import { LiveAuthProvider } from './ui/access/LiveAuthProvider'
@@ -53,7 +54,14 @@ function Root(): ReactNode {
   // Demo mode (default): localStorage + seeded example data.
   const storageWarning = !isLocalStorageAvailable()
   const repo = createLocalStorageLeadRepository({ seed: demoSeed() })
-  const service = createLeadService({ repo, now: systemClock, id: uuid, stageOrder, stageLabel })
+  const service = createLeadService({
+    repo,
+    now: systemClock,
+    id: uuid,
+    stageOrder,
+    stageLabel,
+    callAnalysis: createDemoCallAnalysisProvider(),
+  })
   return (
     <DemoAuthProvider>
       <ServiceProvider value={{ service, mode: 'demo', resetAvailable: true, storageWarning }}>

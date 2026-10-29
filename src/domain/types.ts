@@ -8,7 +8,34 @@
 
 export type StageId = string
 
-export type HistoryKind = 'note' | 'call' | 'email' | 'visit' | 'whatsapp' | 'stage'
+export type HistoryKind = 'note' | 'call' | 'email' | 'visit' | 'whatsapp' | 'stage' | 'call-analysis'
+
+/**
+ * Structured output of analyzing a recorded sales call. Pure data: the
+ * transcript is kept verbatim (never summarized away) and the analysis is the
+ * coaching the LLM derived from it.
+ */
+export interface CallAnalysis {
+  /** One-line headline shown as the entry's text. */
+  summary: string
+  /** What the seller could improve in the conversation. */
+  improvements: string[]
+  /** Open points worth following up on. */
+  followUps: string[]
+  /** What is worth offering next. */
+  offers: string[]
+  /** Concrete next steps. */
+  nextSteps: string[]
+}
+
+/** A transcribed + analyzed call, attached to a `call-analysis` history entry. */
+export interface CallRecordingAnalysis {
+  /** Full transcript, verbatim. */
+  transcript: string
+  analysis: CallAnalysis
+  /** Length of the recorded audio in seconds, when known. */
+  durationSeconds?: number
+}
 
 /** A single activity on a lead's timeline. */
 export interface HistoryEntry {
@@ -17,6 +44,8 @@ export interface HistoryEntry {
   text: string
   /** ISO 8601 timestamp. */
   at: string
+  /** Present only on `call-analysis` entries: the transcript + analysis. */
+  call?: CallRecordingAnalysis
 }
 
 /** A lead moving through the sales funnel. */

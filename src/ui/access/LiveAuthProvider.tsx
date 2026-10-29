@@ -7,8 +7,14 @@ import { createSupabaseLeadRepository } from '../../infrastructure/supabase/supa
 import { resolveTenantId } from '../../infrastructure/supabase/tenant'
 import { systemClock } from '../../infrastructure/clock'
 import { uuid } from '../../infrastructure/id'
+import { createDemoCallAnalysisProvider } from '../../infrastructure/demoCallAnalysisProvider'
+import { liveCallAnalysisFromEnv } from '../../infrastructure/liveCallAnalysisProvider'
 import { stageOrder } from '../../config/pipeline.config'
 import { stageLabel } from '../stageMeta'
+
+// Real transcription + analysis endpoints when configured; otherwise the demo
+// simulator, so live mode still runs before that backend is wired.
+const callAnalysis = liveCallAnalysisFromEnv(import.meta.env) ?? createDemoCallAnalysisProvider()
 
 /**
  * Live-mode providers. Manages the Supabase session, resolves the user's
@@ -31,7 +37,7 @@ export function LiveAuthProvider({ client, children }: { client: SupabaseClient;
       return
     }
     const repo = createSupabaseLeadRepository(client, tenantId)
-    setService(createLeadService({ repo, now: systemClock, id: uuid, stageOrder, stageLabel }))
+    setService(createLeadService({ repo, now: systemClock, id: uuid, stageOrder, stageLabel, callAnalysis }))
     const { data } = await client.auth.getUser()
     setIdentityLabel(data.user?.email ?? 'Cuenta')
     setNotice(null)

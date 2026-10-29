@@ -5,7 +5,7 @@
 
 import * as domain from '../domain'
 import type { HistoryKind, Lead, LeadDraft, LeadFieldsPatch, StageId } from '../domain/types'
-import type { Clock, IdGenerator, LeadRepository } from './ports'
+import type { CallAnalysisProvider, Clock, IdGenerator, LeadRepository } from './ports'
 
 export interface LeadServiceDeps {
   repo: LeadRepository
@@ -15,6 +15,8 @@ export interface LeadServiceDeps {
   stageOrder: StageId[]
   /** Stage id → human label, used for auto-generated history entries. */
   stageLabel: (id: StageId) => string
+  /** Transcribes + analyzes recorded calls (demo-simulated or live). */
+  callAnalysis: CallAnalysisProvider
 }
 
 export interface LeadService {
@@ -25,12 +27,14 @@ export interface LeadService {
   addNote(id: string, text: string): Promise<Lead>
   logContact(id: string, kind: HistoryKind, text: string): Promise<Lead>
   update(id: string, patch: LeadFieldsPatch): Promise<Lead>
+  /** Record a sales call, transcribe + analyze it, and attach it to the history. */
+  analyzeCall(id: string, audio?: Blob): Promise<Lead>
   remove(id: string): Promise<boolean>
   resetDemo(): Promise<void>
 }
 
 export function createLeadService(deps: LeadServiceDeps): LeadService {
-  const { repo, now, id, stageOrder, stageLabel } = deps
+  const { repo, now, id, stageOrder, stageLabel, callAnalysis } = deps
 
   async function requireLead(leadId: string): Promise<Lead> {
     const lead = await repo.get(leadId)
@@ -78,6 +82,22 @@ export function createLeadService(deps: LeadServiceDeps): LeadService {
     async update(leadId, patch) {
       const lead = await requireLead(leadId)
       const updated = domain.updateLeadFields(lead, patch, now())
+      await repo.save(updated)
+      return updated
+    },
+
+    async analyzeCall(leadId, audio) {
+      const lead = await requireLead(leadId)
+      const call = await callAnalysis.analyzeCall({
+        audio,
+        context: {
+          organization: lead.organization,
+          contactName: lead.contactName,
+          product: lead.product,
+          stageLabel: stageLabel(lead.stage),
+        },
+      })
+      const updated = domain.attachCallAnalysis(lead, call, { id: id(), now: now() })
       await repo.save(updated)
       return updated
     },

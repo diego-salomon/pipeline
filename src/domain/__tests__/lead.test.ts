@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { addNote, advanceLead, createLead, logContact, updateLeadFields } from '../lead'
+import { addNote, advanceLead, attachCallAnalysis, createLead, logContact, updateLeadFields } from '../lead'
 import { LeadValidationError } from '../validation'
-import type { LeadDraft } from '../types'
+import type { CallRecordingAnalysis, LeadDraft } from '../types'
 
 const order = ['nuevo', 'cotizado', 'cerrado']
 const labelFor = (s: string) => s.toUpperCase()
@@ -72,6 +72,40 @@ describe('addNote / logContact', () => {
   it('logs a simulated whatsapp contact', () => {
     const lead = logContact(makeLead(), 'whatsapp', 'Cotización enviada por WhatsApp', { id: 'w1', now: '2026-01-02T00:00:00.000Z' })
     expect(lead.history.at(-1)?.kind).toBe('whatsapp')
+  })
+})
+
+describe('attachCallAnalysis', () => {
+  const call: CallRecordingAnalysis = {
+    transcript: 'Vendedor: Hola.\nLuis: Lo estamos evaluando.',
+    durationSeconds: 90,
+    analysis: {
+      summary: 'Interés con objeción de precio',
+      improvements: ['Cuantificar el valor'],
+      followUps: ['Precio'],
+      offers: ['Descuento por volumen'],
+      nextSteps: ['Enviar propuesta'],
+    },
+  }
+
+  it('appends a call-analysis entry carrying the transcript + analysis', () => {
+    const lead = attachCallAnalysis(makeLead(), call, { id: 'c1', now: '2026-01-02T00:00:00.000Z' })
+    const last = lead.history.at(-1)
+    expect(last?.kind).toBe('call-analysis')
+    expect(last?.text).toBe('Interés con objeción de precio')
+    expect(last?.call?.transcript).toContain('Vendedor')
+    expect(last?.call?.analysis.offers).toEqual(['Descuento por volumen'])
+    expect(lead.updatedAt).toBe('2026-01-02T00:00:00.000Z')
+  })
+
+  it('does not mutate the original lead', () => {
+    const lead = makeLead()
+    attachCallAnalysis(lead, call, { id: 'c1', now: '2026-01-02T00:00:00.000Z' })
+    expect(lead.history).toHaveLength(1)
+  })
+
+  it('rejects an empty transcript', () => {
+    expect(() => attachCallAnalysis(makeLead(), { ...call, transcript: '  ' }, { id: 'c1', now: 'now' })).toThrow()
   })
 })
 
