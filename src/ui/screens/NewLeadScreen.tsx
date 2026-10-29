@@ -58,8 +58,8 @@ export function NewLeadScreen() {
 
   return (
     <div className="mx-auto max-w-[38rem]">
-      <h1 className="mb-4 text-2xl font-semibold">Nueva {pipeline.entity.singular}</h1>
-      <form className="card grid gap-4 p-5" onSubmit={onSubmit} noValidate>
+      <h1 className="mb-5 text-3xl">Nueva {pipeline.entity.singular}</h1>
+      <form className="card grid gap-4 p-6" onSubmit={onSubmit} noValidate>
         <TextField label={f.organization} value={form.organization} onChange={set('organization')} error={errors.organization} autoFocus />
         <TextField label={f.contactName} value={form.contactName} onChange={set('contactName')} error={errors.contactName} />
         <div className="grid grid-cols-2 gap-4">

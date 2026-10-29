@@ -51,12 +51,12 @@ function ContactRow({ icon, label, href }: { icon: string; label: string; href: 
       href={href}
       target={external ? '_blank' : undefined}
       rel={external ? 'noreferrer noopener' : undefined}
-      className="flex items-center gap-3 no-underline"
+      className="-mx-2 flex items-center gap-3 rounded-xl p-2 no-underline transition-colors hover:bg-panel"
     >
-      <span className="text-brand">
+      <span className="grid h-10 w-10 flex-none place-items-center rounded-full" style={{ background: 'var(--color-panel)' }}>
         <Icon path={icon} />
       </span>
-      <span>{label}</span>
+      <span className="min-w-0 break-words">{label}</span>
     </a>
   )
 }
