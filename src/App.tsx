@@ -28,7 +28,7 @@ const router = createBrowserRouter([
       { path: '*', element: <NotFoundScreen /> },
     ],
   },
-])
+], { basename: import.meta.env.BASE_URL.replace(/\/$/, '') })
 
 export function App() {
   return <RouterProvider router={router} />
