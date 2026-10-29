@@ -4,7 +4,7 @@ import './index.css'
 import { App } from './App'
 import { brand } from './config/brand.config'
 import { stageOrder } from './config/pipeline.config'
-import { applyBrandTheme, applyTheme, getStoredTheme } from './ui/theme/applyBrandTheme'
+import { applyBrandTheme, applyTheme } from './ui/theme/applyBrandTheme'
 import { stageLabel } from './ui/stageMeta'
 import { createLeadService } from './application/leadService'
 import { createLocalStorageLeadRepository, isLocalStorageAvailable } from './infrastructure/localStorageLeadRepository'
@@ -21,7 +21,7 @@ const mode = import.meta.env.VITE_MODE === 'live' ? 'live' : 'demo'
 
 // Apply branding + theme before first paint.
 applyBrandTheme(brand)
-applyTheme(getStoredTheme())
+applyTheme('light') // Modo claro fijo (sin toggle día/noche).
 document.title = brand.name
 
 function ConfigError() {

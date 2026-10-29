@@ -3,7 +3,6 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { brand } from '../../config/brand.config'
 import { useServices } from '../app/ServiceContext'
 import { Logo } from './primitives'
-import { ThemeToggle } from './ThemeToggle'
 
 const NAV = [
   { to: '/', label: 'Tablero', end: true },
@@ -45,7 +44,6 @@ export function Layout() {
                 {item.label}
               </NavLink>
             ))}
-            <ThemeToggle />
           </nav>
         </div>
       </header>

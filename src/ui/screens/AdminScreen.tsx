@@ -35,10 +35,6 @@ function LoginForm() {
     <div className="mx-auto mt-8 max-w-sm">
       <h1 className="mb-4 text-center text-2xl font-semibold">{brand.name}</h1>
       <form className="card grid gap-4 p-6" onSubmit={onSubmit}>
-        <div className="flex items-baseline justify-between">
-          <span className="text-xs font-bold uppercase tracking-wide text-muted">Acceso</span>
-          <span className="folio text-xs">N.º 0001</span>
-        </div>
         {mode === 'live' && (
           <div>
             <label className="label" htmlFor="email">Correo</label>

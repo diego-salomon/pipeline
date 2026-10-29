@@ -13,7 +13,7 @@ const ARROW = 'M5 12h14 M13 6l6 6-6 6'
 const TRASH = 'M3 6h18 M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2 M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14'
 
 const CONTACT_KINDS: HistoryKind[] = ['note', 'call', 'email', 'whatsapp', 'visit']
-const SECTION_HEAD = 'text-sm font-bold uppercase tracking-wide'
+const SECTION_HEAD = 'text-base font-semibold'
 
 type Service = ReturnType<typeof useLeadService>
 
@@ -83,10 +83,12 @@ function LeadDetail({
         </Link>
         <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold">{lead.organization}</h1>
+            <h1 className="text-2xl">{lead.organization}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-3">
-              <StageStamp stageId={lead.stage} tilt />
-              <strong className="num text-lg">{formatMoney(lead.estimatedValue)}</strong>
+              <StageStamp stageId={lead.stage} />
+              <strong className="num text-2xl" style={{ fontFamily: 'var(--font-display)' }}>
+                {formatMoney(lead.estimatedValue)}
+              </strong>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
